@@ -1,10 +1,9 @@
 3D starfield
 
-## Getting Started
+## Preview
+http://htmlpreview.github.io/?https://github.com/QTimort/3d-starfield/blob/master/dist/index.html
 
-1.  Clone the repo:
-
-        git clone https://github.com/qtimort/3d-starfield.git
+## Setup
 
 2.  Install dependencies:
 
