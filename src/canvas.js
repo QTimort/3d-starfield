@@ -12,7 +12,7 @@ const mouse = {
     y: innerHeight / 2.0
 };
 
-const nbStars = 100;
+const nbStars = 500;
 const starsHandler = new StarHandler(canvas.width, canvas.height, nbStars);
 const starDrawer = new StarDrawer(canvas);
 

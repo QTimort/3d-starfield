@@ -110,7 +110,7 @@ var mouse = {
     y: innerHeight / 2.0
 };
 
-var nbStars = 100;
+var nbStars = 500;
 var starsHandler = new StarHandler(canvas.width, canvas.height, nbStars);
 var starDrawer = new StarDrawer(canvas);
 
