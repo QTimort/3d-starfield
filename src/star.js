@@ -1,5 +1,4 @@
 const Vec3 = require('./vec3.js');
-const Vec2 = require('./vec3.js');
 const Utils = require('./utils.js');
 
 class Star {
@@ -18,16 +17,11 @@ class Star {
       height / 2.0,
       Utils.fRand(0.0, Utils.fRand(0.0, width))
     );
-    this._prevPosition = new Vec2(
-      this._position.x,
-      this._position.y
-    );
-    this._prevRadius = 0.0;
     this._radius = Utils.fRand(1.0, 4.0);
   }
 
   move(width, height, speed) {
-    let multiplier = 1.0 - (width / this._position.z);
+    const multiplier = 1.0 - (width / this._position.z);
     this._position.x += this._velocity.x * speed.x * multiplier;
     this._position.y += this._velocity.y * speed.y * multiplier;
     if ((this._position.z - this._velocity.z * speed.z) > 0.0) {
@@ -51,11 +45,6 @@ class Star {
     this._position.z = width;
   }
 
-  updatePreviousPos() {
-    this._prevPosition = new Vec2(this._position.x, this._position.y);
-    this._prevRadius = this._radius;
-  }
-
   get velocity() {
     return this._velocity;
   }
@@ -70,22 +59,6 @@ class Star {
 
   set position(value) {
     this._position = value;
-  }
-
-  get prevPosition() {
-    return this._prevPosition;
-  }
-
-  set prevPosition(value) {
-    this._prevPosition = value;
-  }
-
-  get prevRadius() {
-    return this._prevRadius;
-  }
-
-  set prevRadius(value) {
-    this._prevRadius = value;
   }
 
   get radius() {

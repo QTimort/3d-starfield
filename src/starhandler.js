@@ -12,36 +12,22 @@ class StarHandler {
   }
 
   initAll() {
+    this._stars = new Array(this._nbStars);
     for (let i = 0; i < this._nbStars; ++i) {
       this._stars[i] = new Star(this._width, this._height);
     }
   }
 
   updateAll(screenRot) {
-    for (let i = 0; i < this._nbStars; ++i) {
-      this._stars[i].update(this._width, this._height, screenRot, this._speedVector);
-    }
-  }
-
-  updateAllPreviousPos() {
-    for (let i = 0; i < this._nbStars; ++i) {
-      this._stars[i].updatePreviousPos();
-    }
+    this._stars.forEach((star) => {
+      star.update(this._width, this._height, screenRot, this._speedVector);
+    });
   }
 
   incrementSpeedVector(speed) {
     this._speedVector.x += speed.x;
     this._speedVector.y += speed.y;
     this._speedVector.z += speed.z;
-  }
-
-
-  get speedVector() {
-    return this._speedVector;
-  }
-
-  set speedVector(value) {
-    this._speedVector = value;
   }
 
   get stars() {

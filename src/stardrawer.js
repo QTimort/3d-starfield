@@ -1,26 +1,33 @@
 class StarDrawer {
-  constructor(canvas) {
+  constructor(canvas, mouse) {
     this._canvas = canvas;
     this._ctx = canvas.getContext("2d");
     this._width = canvas.width;
     this._height = canvas.height;
     this._clearColor = "rgba(0,0,0,0.39)";
+    this._mouse = mouse;
   }
 
   drawAllStars(stars, mouse) {
-    for (let i = 0; i < stars.length; i++) {
-      this.drawStar(stars[i], mouse);
-    }
+    stars.forEach((star) => {
+      this.drawStar(star, mouse);
+    });
   }
 
-  drawStar(star, mouse) {
-    let position = star.position;
-    let percent = 1.0 - star.position.z / this._width;
-    let radius = (star.radius * percent);
+  drawStar(star) {
+    const position = star.position;
+    const percent = 1.0 - star.position.z / this._width;
+    const radius = (star.radius * percent);
 
     if (star.position.z > 0) {
       this._ctx.beginPath();
-      this._ctx.arc(position.x + mouse.x, position.y + mouse.y, radius, 0, 2 * Math.PI);
+      this._ctx.arc(
+        position.x + this._mouse.x,
+        position.y + this._mouse.y,
+        radius,
+        0,
+        2 * Math.PI
+      );
       this._ctx.fillStyle = 'rgba(200, 200, 255,' + percent * 255.0 + ')';
       this._ctx.fill();
     }

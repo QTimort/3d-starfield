@@ -8,18 +8,18 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const mouse = {
-    x: innerWidth / 2.0,
-    y: innerHeight / 2.0
+    x: 0,
+    y: 0
 };
 
 const nbStars = 500;
 const starsHandler = new StarHandler(canvas.width, canvas.height, nbStars);
-const starDrawer = new StarDrawer(canvas);
+const starDrawer = new StarDrawer(canvas, mouse);
 
 // Event Listeners
-addEventListener('mousemove', event => {
-    mouse.x = event.clientX - canvas.width / 2.0;
-    mouse.y = event.clientY - canvas.height / 2.0;
+addEventListener('mousemove', (event) => {
+    mouse.x = canvas.width / 2.0 - event.clientX;
+    mouse.y = canvas.height / 2.0 - event.clientY;
 });
 
 addEventListener('resize', () => {
@@ -27,12 +27,16 @@ addEventListener('resize', () => {
     canvas.height = innerHeight;
 });
 
+addEventListener("touchmove", (event) => {
+    mouse.x = canvas.width / 2.0 - event.changedTouches[0].clientX;
+    mouse.y = canvas.height / 2.0 - event.changedTouches[0].clientY;
+});
+
 function animate() {
     requestAnimationFrame(animate);
     starDrawer.clear();
     starsHandler.updateAll(SCREEN_ROT_DIV);
-    starDrawer.drawAllStars(starsHandler.stars, mouse);
-    starsHandler.updateAllPreviousPos();
+    starDrawer.drawAllStars(starsHandler.stars);
 }
 
 animate();

@@ -106,18 +106,18 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 var mouse = {
-    x: innerWidth / 2.0,
-    y: innerHeight / 2.0
+    x: 0,
+    y: 0
 };
 
 var nbStars = 500;
 var starsHandler = new StarHandler(canvas.width, canvas.height, nbStars);
-var starDrawer = new StarDrawer(canvas);
+var starDrawer = new StarDrawer(canvas, mouse);
 
 // Event Listeners
 addEventListener('mousemove', function (event) {
-    mouse.x = event.clientX - canvas.width / 2.0;
-    mouse.y = event.clientY - canvas.height / 2.0;
+    mouse.x = canvas.width / 2.0 - event.clientX;
+    mouse.y = canvas.height / 2.0 - event.clientY;
 });
 
 addEventListener('resize', function () {
@@ -125,12 +125,16 @@ addEventListener('resize', function () {
     canvas.height = innerHeight;
 });
 
+addEventListener("touchmove", function (event) {
+    mouse.x = canvas.width / 2.0 - event.changedTouches[0].clientX;
+    mouse.y = canvas.height / 2.0 - event.changedTouches[0].clientY;
+});
+
 function animate() {
     requestAnimationFrame(animate);
     starDrawer.clear();
     starsHandler.updateAll(SCREEN_ROT_DIV);
-    starDrawer.drawAllStars(starsHandler.stars, mouse);
-    starsHandler.updateAllPreviousPos();
+    starDrawer.drawAllStars(starsHandler.stars);
 }
 
 animate();
@@ -152,7 +156,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Vec3 = __webpack_require__(/*! ./vec3.js */ "./src/vec3.js");
-var Vec2 = __webpack_require__(/*! ./vec3.js */ "./src/vec3.js");
 var Utils = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
 
 var Star = function () {
@@ -167,8 +170,6 @@ var Star = function () {
     value: function init(width, height) {
       this._velocity = new Vec3(Utils.fRand(-5.0, 5.0), Utils.fRand(-5.0, 5.0), Utils.fRand(1.0, 5.0));
       this._position = new Vec3(width / 2.0, height / 2.0, Utils.fRand(0.0, Utils.fRand(0.0, width)));
-      this._prevPosition = new Vec2(this._position.x, this._position.y);
-      this._prevRadius = 0.0;
       this._radius = Utils.fRand(1.0, 4.0);
     }
   }, {
@@ -200,12 +201,6 @@ var Star = function () {
       this._position.z = width;
     }
   }, {
-    key: 'updatePreviousPos',
-    value: function updatePreviousPos() {
-      this._prevPosition = new Vec2(this._position.x, this._position.y);
-      this._prevRadius = this._radius;
-    }
-  }, {
     key: 'velocity',
     get: function get() {
       return this._velocity;
@@ -220,22 +215,6 @@ var Star = function () {
     },
     set: function set(value) {
       this._position = value;
-    }
-  }, {
-    key: 'prevPosition',
-    get: function get() {
-      return this._prevPosition;
-    },
-    set: function set(value) {
-      this._prevPosition = value;
-    }
-  }, {
-    key: 'prevRadius',
-    get: function get() {
-      return this._prevRadius;
-    },
-    set: function set(value) {
-      this._prevRadius = value;
     }
   }, {
     key: 'radius',
@@ -269,7 +248,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var StarDrawer = function () {
-  function StarDrawer(canvas) {
+  function StarDrawer(canvas, mouse) {
     _classCallCheck(this, StarDrawer);
 
     this._canvas = canvas;
@@ -277,25 +256,28 @@ var StarDrawer = function () {
     this._width = canvas.width;
     this._height = canvas.height;
     this._clearColor = "rgba(0,0,0,0.39)";
+    this._mouse = mouse;
   }
 
   _createClass(StarDrawer, [{
     key: "drawAllStars",
     value: function drawAllStars(stars, mouse) {
-      for (var i = 0; i < stars.length; i++) {
-        this.drawStar(stars[i], mouse);
-      }
+      var _this = this;
+
+      stars.forEach(function (star) {
+        _this.drawStar(star, mouse);
+      });
     }
   }, {
     key: "drawStar",
-    value: function drawStar(star, mouse) {
+    value: function drawStar(star) {
       var position = star.position;
       var percent = 1.0 - star.position.z / this._width;
       var radius = star.radius * percent;
 
       if (star.position.z > 0) {
         this._ctx.beginPath();
-        this._ctx.arc(position.x + mouse.x, position.y + mouse.y, radius, 0, 2 * Math.PI);
+        this._ctx.arc(position.x + this._mouse.x, position.y + this._mouse.y, radius, 0, 2 * Math.PI);
         this._ctx.fillStyle = 'rgba(200, 200, 255,' + percent * 255.0 + ')';
         this._ctx.fill();
       }
@@ -348,6 +330,7 @@ var StarHandler = function () {
   _createClass(StarHandler, [{
     key: 'initAll',
     value: function initAll() {
+      this._stars = new Array(this._nbStars);
       for (var i = 0; i < this._nbStars; ++i) {
         this._stars[i] = new Star(this._width, this._height);
       }
@@ -355,16 +338,11 @@ var StarHandler = function () {
   }, {
     key: 'updateAll',
     value: function updateAll(screenRot) {
-      for (var i = 0; i < this._nbStars; ++i) {
-        this._stars[i].update(this._width, this._height, screenRot, this._speedVector);
-      }
-    }
-  }, {
-    key: 'updateAllPreviousPos',
-    value: function updateAllPreviousPos() {
-      for (var i = 0; i < this._nbStars; ++i) {
-        this._stars[i].updatePreviousPos();
-      }
+      var _this = this;
+
+      this._stars.forEach(function (star) {
+        star.update(_this._width, _this._height, screenRot, _this._speedVector);
+      });
     }
   }, {
     key: 'incrementSpeedVector',
@@ -372,14 +350,6 @@ var StarHandler = function () {
       this._speedVector.x += speed.x;
       this._speedVector.y += speed.y;
       this._speedVector.z += speed.z;
-    }
-  }, {
-    key: 'speedVector',
-    get: function get() {
-      return this._speedVector;
-    },
-    set: function set(value) {
-      this._speedVector = value;
     }
   }, {
     key: 'stars',
