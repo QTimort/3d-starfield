@@ -1,4 +1,4 @@
-3D starfield
+A simple 3D starfield made without library in native JS
 
 ## Preview
 http://htmlpreview.github.io/?https://github.com/QTimort/3d-starfield/blob/master/dist/index.html
